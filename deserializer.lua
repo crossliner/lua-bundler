@@ -1,5 +1,6 @@
 local bit = bit or require("bit");
 local unpack = unpack or table.unpack;
+local fione = loadfile("fione.lua")();
 
 local encoders = {}; do 
   function encoders:decode(arr) 
@@ -131,3 +132,22 @@ local format = {}; do
     return data;
   end;
 end;
+
+local data = format.new(
+  array.new({ })
+):deserialize();
+
+local function load(data, file) 
+  local bc = encoders:decode(data.byteCodeArray:get(data.fileMap[file]));
+  local state = fione.bc_to_state(bc);
+  local func = fione.wrap_state(state, {
+    import = function(file) 
+      return load(data, file)
+    end,
+    print = print
+  });
+
+  return func();
+end;
+
+--load(data, "main.lua")
