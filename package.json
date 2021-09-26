@@ -1,0 +1,9 @@
+{
+  "name": "serialized-bundler",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "leb128": "^0.0.5"
+  }
+}
