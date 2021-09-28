@@ -4,6 +4,8 @@ const { resolve } = require("path");
 const config = require("./config.json");
 const format = require("./format");
 const loader = readFileSync("./loader.lua");
+const luamin = require("./luamin");
+
 const bundle = new format(config.strip);
 
 const [ , , ...args ] = process.argv;
@@ -27,5 +29,8 @@ local format_Data = format.new(data):deserialize();
 
 load(format_Data, "main.lua");
 `
+const minifiedData = config.minify ? luamin.Minify(bundleData, { 
+  RenameVariables: true
+}) : bundleData;
 
-writeFileSync("dist.lua", bundleData);
+writeFileSync("dist.lua", minifiedData);
