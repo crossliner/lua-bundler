@@ -2,9 +2,10 @@ const compile = require("../compile");
 const serializer = require("../serializer");
 
 module.exports = class format {
-  constructor() {
+  constructor(strip) {
     this.byteCodeArray = [];
     this.fileMap = new Map();
+    this.strip = strip;
   }
 
   add(file, script) {
@@ -26,8 +27,8 @@ module.exports = class format {
 
     for (let i in this.byteCodeArray) {
       const v = this.byteCodeArray[i];
-      const bytecode = compile(v);
-
+      const bytecode = compile(v, this.strip);
+      if (typeof bytecode === "string") throw new Error(bytecode);
       format_Serializer.writeLong(bytecode.length);
       format_Serializer.writeBuffer(bytecode);
     }

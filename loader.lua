@@ -534,8 +534,8 @@ local function open_lua_upvalue(list, index, memory)
 end
 
 local function on_lua_error(failed, err)
-	local src = failed.source
-	local line = failed.lines[failed.pc - 1]
+	local src = failed.source or ""
+	local line = failed.lines[failed.pc - 1] or 0;
 
 	error(string.format('%s:%i: %s', src, line, err), 0)
 end
@@ -1201,21 +1201,15 @@ local format = {}; do
   end;
 end;
 
-local data = format.new(
-  array.new({ })
-):deserialize();
-
 local function load(data, file) 
   local bc = encoders:decode(data.byteCodeArray:get(data.fileMap[file]));
   local state = fione.bc_to_state(bc);
-  local func = fione.wrap_state(state, {
-    import = function(file) 
-      return load(data, file)
-    end,
-    print = print
-  });
+	local env = getfenv();
+	env.import = function(file) 
+		return load(data, file)
+	end;
+
+  local func = fione.wrap_state(state, env);
 
   return func();
 end;
-
---load(data, "main.lua")
